@@ -1,6 +1,6 @@
-import config from '../config/index.js';
+import {env} from '../config/index.js';
 import {drizzle} from 'drizzle-orm/postgres-js';
 
-const db = drizzle(config.database_url);
+const db = drizzle(env.databaseUrl);
 
 export default db;

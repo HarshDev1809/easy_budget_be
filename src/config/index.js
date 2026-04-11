@@ -1,9 +1,16 @@
 import 'dotenv/config';
+import {envSchema} from '../schemas/env.schema.js'
 
-const config = {
-        http_port : process.env.HTTP_PORT,
-        database_url : process.env.DATABASE_URL,
-        database_direct_url : process.env.DIRECT_URL
+const _env = envSchema.safeParse(process.env);
+
+if(!_env.success){
+        console.error('Invalid ENV ',_env.error);
+        process.exit(1);
 }
 
-export default config;
+export const env = {
+        httpPort : _env.data.HTTP_PORT,
+        directUrl : _env.data.DIRECT_URL,
+        databaseUrl : _env.data.DATABASE_URL,
+        nodeEnv : _env.data.NODE_ENV
+};
