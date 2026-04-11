@@ -1,15 +1,15 @@
-import config from "./config/index.js";
+import {env} from "./config/index.js";
 import app from "./app.js";
 import { drizzle } from 'drizzle-orm/postgres-js'
 import postgres from 'postgres'
 
 async function main() {
-    const client = postgres(process.env.DATABASE_URL)
+    const client = postgres(env.databaseUrl)
     const db = drizzle({ client });
 }
 
 main();
 
-app.listen(config.http_port,()=>{
-        console.log("Server running on ",config.http_port);
+app.listen(env.httpPort,()=>{
+        console.log("Server running on ",env.httpPort);
 })
