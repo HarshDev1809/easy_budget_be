@@ -20,11 +20,14 @@
   },
   "homepage": "https://github.com/HarshDev1809/easy_budget_be#readme",
   "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "dotenv": "^17.4.1",
     "drizzle-orm": "^0.45.2",
     "express": "^5.2.1",
     "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.3",
     "nodemon": "^3.1.14",
     "postgres": "^3.4.9",
     "zod": "^4.3.6"

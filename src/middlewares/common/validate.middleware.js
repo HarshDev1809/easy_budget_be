@@ -8,9 +8,8 @@ export const validate = (schema) => (req,res,next)=>{
         if(!result.success){
                 return res.status(400).json({
                         success : false,
-                        status : "fail",
                         message : "Validation Error",
-                        error : result.error.message,
+                        error : JSON.parse(result.error.message).map(e => ({field : e.path.join(" > "),error : e.message})),
                         // errors : result.error.errors.map(e => ({
                         //          field: e.path.join('.'),
                         //         message: e.message
@@ -18,9 +17,12 @@ export const validate = (schema) => (req,res,next)=>{
                 })
         }
 
-        req.body = result.data.body;
-        req.query = result.data.query;
-        req.params = result.data.params;
+        req.validated = {
+                ...req.validated,
+                query: result.data.query,
+                body : result.data.body,
+                params : result.data.params
+        };
 
         next();
 }
