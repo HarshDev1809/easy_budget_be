@@ -1,3 +1,4 @@
+import { Request,Response } from 'express';
 import { defaultConfig } from "../../config/default.config.js";
 import { env } from "../../config/index.js"
 import bcrypt from 'bcrypt';
@@ -6,8 +7,11 @@ import { insertUser } from "../../utils/auth/insertUser.js";
 import { generateAccessToken } from "../../utils/auth/generateAccessToken.js";
 import { insertRefreshToken } from "../../utils/auth/insertRefreshToken.js";
 import { checkUserData } from "../../utils/auth/checkUserData.js";
+import { getStatusCode } from '../../utils/error/getStatusCode.js';
+import { getMessage } from '../../utils/error/getMessage.js';
+import { getStack } from '../../utils/error/getStack.js';
 
-export const signup = async(req,res) => {
+export const signup = async(req: Request,res : Response) => {
         try{
                 const {email,password,name,phone_number} = req.validated.body ?? {};
 
@@ -41,16 +45,17 @@ export const signup = async(req,res) => {
                 res.cookie('access_token',accessToken,{
                         httpOnly : true,
                         secure : env.nodeEnv === 'dev'? false :true,
-                        sameSite : 'Lax',
+                        sameSite : 'lax',
                         maxAge : 15 * 60 * 1000,
                         path : '/'
                 });
 
                 res.cookie('refresh_token',refreshToken,{
                         httpOnly : true,
-                        secure : env.nodeEnv === 'dev'? false :true,                        sameSite : 'Strict',
+                        secure : env.nodeEnv === 'dev'? false :true,
                         maxAge : 7 * 24 * 60 * 60 * 1000,
-                        path : '/auth/refresh'
+                        path : '/auth/refresh',
+                        sameSite : 'strict'
                 })
 
                 return res.status(200).json({
@@ -59,12 +64,12 @@ export const signup = async(req,res) => {
                 })
 
         }catch(error){
-                return res.status(error.statusCode ?? 500).json({
+                return res.status(getStatusCode(error)).json({
                         message : "Something went wrong while signup",
                         success : false,
                         status : "error",
-                        error : error.message,
-                        stack : env.nodeEnv === 'dev' ? error.stack : undefined
+                        error : getMessage(error),
+                        stack : env.nodeEnv === 'dev' ? getStack(error) : undefined
                 })
         }
 }

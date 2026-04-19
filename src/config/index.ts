@@ -8,11 +8,20 @@ if(!_env.success){
         process.exit(1);
 }
 
-export const env = {
+interface Env {
+        httpPort : number;
+        directUrl : string,
+        databaseUrl : string;
+        nodeEnv : string;
+        secretKey : string;
+        saltRounds : number;
+}
+
+export const env : Env = {
         httpPort : _env.data.HTTP_PORT,
         directUrl : _env.data.DIRECT_URL,
         databaseUrl : _env.data.DATABASE_URL,
         nodeEnv : _env.data.NODE_ENV,
         secretKey : _env.data.SECRET_KEY,
         saltRounds : _env.data.SALT_ROUNDS
-};
+} as const;

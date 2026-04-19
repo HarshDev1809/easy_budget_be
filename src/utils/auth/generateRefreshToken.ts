@@ -1,6 +1,6 @@
 import crypto from 'node:crypto';
 
-export const generateRefreshToken = ()=>{
+export const generateRefreshToken = (): string=>{
         const token = crypto.randomBytes(40).toString('hex');
 
         const hashedToken = crypto

@@ -1,6 +1,10 @@
+import { Request,Response } from 'express';
 import {env} from '../../config/index.js'
+import { getStatusCode } from '../../utils/error/getStatusCode.js';
+import { getMessage } from '../../utils/error/getMessage.js';
+import { getStack } from '../../utils/error/getStack.js';
 
-export const debug = (req,res)=>{
+export const debug = (req : Request,res : Response)=>{
         try{
                 if(env.nodeEnv !== 'dev'){
                         return res.status(403).json({
@@ -16,9 +20,9 @@ export const debug = (req,res)=>{
                 })
 
         }catch(error){
-                return res.status(error.statusCode ?? 500).json({
-                        error : error.message,
-                        stack : env.nodeEnv === 'dev' ? error.stack : undefined
+                return res.status(getStatusCode(error)).json({
+                        error : getMessage(error),
+                        stack : env.nodeEnv === 'dev' ? getStack(error) : undefined
                 })
         }
 }

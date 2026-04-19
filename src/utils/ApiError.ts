@@ -1,9 +1,15 @@
 export class ApiError extends Error {
-  constructor(statusCode, message) {
+  
+  public statusCode : number;
+  public success : boolean;
+
+  constructor(statusCode : number, message : string) {
     super(message);
     this.statusCode = statusCode;
     this.success = false;
     
+    Object.setPrototypeOf(this, ApiError.prototype);
+
     // Captures the stack trace (useful for debugging)
     Error.captureStackTrace(this, this.constructor);
   }

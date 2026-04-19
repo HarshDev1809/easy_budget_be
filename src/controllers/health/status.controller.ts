@@ -1,7 +1,10 @@
+import { Request,Response } from 'express';
 import { sql } from 'drizzle-orm';
 import db from '../../db/index.js'
+import { getMessage } from '../../utils/error/getMessage.js';
 
-export const status = async (req,res)=>{
+export const status = async (req: Request,res : Response)=>{
+        console.log("running");
         try{
                 await db.execute(sql`SELECT 1`);
 
@@ -16,7 +19,7 @@ export const status = async (req,res)=>{
                 return res.status(500).json({
                         message : "Internal Server Error",
                         success : false,
-                        error   : error.message
+                        error   : getMessage(error)
                 });
 
         }
