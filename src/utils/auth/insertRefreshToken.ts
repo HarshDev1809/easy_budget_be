@@ -1,8 +1,16 @@
 import { defaultConfig } from "../../config/default.config.js";
 import { refreshTokens } from "../../db/schema.js";
+import { DefaultConfig } from "../../types/common.js";
 import { ApiError } from "../ApiError.js";
+import { getMessage } from "../error/getMessage.js";
+import { getStatusCode } from "../error/getStatusCode.js";
 
-export const insertRefreshToken = async(config = defaultConfig) => {
+interface InsertRefreshTokenConfig extends DefaultConfig {
+        refreshToken : string;
+        userId : string
+}
+
+export const insertRefreshToken = async(config : InsertRefreshTokenConfig) => {
         const {db, refreshToken,userId} = config;
 
         try{
@@ -17,7 +25,7 @@ export const insertRefreshToken = async(config = defaultConfig) => {
 
         }catch(error){
                 
-                throw new ApiError(error.statusCode ?? 500, `Something went wrong while inserting refresh token : ${error.message}`);
+                throw new ApiError(getStatusCode(error), `Something went wrong while inserting refresh token : ${getMessage(error)}`);
 
         }
 }

@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "target": "ESNext",
+    "lib": ["ESNext"],
+    "types": ["node"],
+    
+    "sourceMap": true,
+    "declaration": true,
+
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    
+    // Helps with clean imports
+    "forceConsistentCasingInFileNames": true,
+    "moduleDetection": "force"
+  },
+  "include": ["src/**/*", "src/types/express.d.ts"],
+  "exclude": ["node_modules"]
+}
