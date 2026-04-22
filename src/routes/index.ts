@@ -4,8 +4,6 @@ import authRoutes from "./auth.routes.js"
 import {debug} from '../controllers/debug/debug.controller.js'
 
 const routes = Router();
-
-routes.use('/auth',authRoutes)
 routes.get("/health",status);
 routes.use('/debug',debug);
 

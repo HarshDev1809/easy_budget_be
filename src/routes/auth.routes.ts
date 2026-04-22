@@ -1,12 +1,10 @@
-import {Router} from 'express';
-import { validate } from '../middlewares/common/validate.middleware.js';
-import { signup } from '../controllers/auth/signup.controller.js';
-import { signupSchema } from '../schemas/auth/signup.schema.js';
-// import {signinSchema} from   '../schemas/auth/signin.schema.js';
+import express from "express";
+import { toNodeHandler } from "better-auth/node";
+import { auth } from "../lib/auth.js";
 
-const router = Router();
+const router = express.Router();
 
-// router.post('/signin',[validate(signinSchema)])
-router.post('/signup',[validate(signupSchema)],signup);
+// Match everything inside this router
+router.all("*all", toNodeHandler(auth));
 
 export default router;

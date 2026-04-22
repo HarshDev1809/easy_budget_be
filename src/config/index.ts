@@ -13,8 +13,9 @@ interface Env {
         directUrl : string,
         databaseUrl : string;
         nodeEnv : string;
-        secretKey : string;
+        betterAuthSecret : string;
         saltRounds : number;
+        betterAuthUrl : string;
 }
 
 export const env : Env = {
@@ -22,6 +23,7 @@ export const env : Env = {
         directUrl : _env.data.DIRECT_URL,
         databaseUrl : _env.data.DATABASE_URL,
         nodeEnv : _env.data.NODE_ENV,
-        secretKey : _env.data.SECRET_KEY,
-        saltRounds : _env.data.SALT_ROUNDS
+        betterAuthSecret : _env.data.BETTER_AUTH_SECRET,
+        saltRounds : _env.data.SALT_ROUNDS,
+        betterAuthUrl : _env.data.BETTER_AUTH_URL
 } as const;

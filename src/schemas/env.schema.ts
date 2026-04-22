@@ -5,6 +5,7 @@ export const envSchema = z.object({
         NODE_ENV : z.enum(['dev','prod']).default('dev'),
         DATABASE_URL : z.string(),
         DIRECT_URL : z.string(),
-        SECRET_KEY : z.string(),
-        SALT_ROUNDS : z.string().transform(Number).default(12)
+        BETTER_AUTH_SECRET : z.string(),
+        SALT_ROUNDS : z.string().transform(Number).default(12),
+        BETTER_AUTH_URL : z.string(),
 });
