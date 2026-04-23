@@ -5,6 +5,6 @@ import { auth } from "../lib/auth.js";
 const router = express.Router();
 
 // Match everything inside this router
-router.all("*all", toNodeHandler(auth));
+router.all("/{*splat}", toNodeHandler(auth));
 
 export default router;

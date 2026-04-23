@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import routes from './routes/index.js'
 import authRoutes from './routes/auth.routes.js'
 import cookieParser from 'cookie-parser'
+import { errorHandler } from './utils/errorHandler.js';
 
 const app = express();
 
@@ -14,13 +15,11 @@ app.use(cors());
 //     const handler = toNodeHandler(auth);
 //     handler(req, res);
 // });
-app.use("/api/v1/auth", authRoutes);
+app.use("/api/auth", authRoutes);
 app.use(cookieParser())
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/api/v1',routes);
-app.all("*all", (req, res) => {
-    res.status(404).send("Global 404: Route not found");
-});
+app.use(errorHandler)
 
 export default app;
