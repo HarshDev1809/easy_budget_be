@@ -4,3 +4,6 @@ node_modules
 dist/
 cookies.txt
 commit.txt
+GEMINI.md
+*.md
+
