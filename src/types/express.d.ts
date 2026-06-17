@@ -3,9 +3,13 @@ import * as express from 'express';
 declare global {
   namespace Express {
     interface Request {
-      validated?: any; // Or use your Zod inferred type here
-      user?: any;
+      validated?: any;
       session?: any;
+      user: {
+        id: string;
+        email: string;
+        // add other fields you set on req.user
+      };
     }
   }
 }

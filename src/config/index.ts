@@ -16,6 +16,9 @@ interface Env {
         betterAuthSecret : string;
         saltRounds : number;
         betterAuthUrl : string;
+        redisHost : string,
+        redisPort : number,
+        redisPassword : string
 }
 
 export const env : Env = {
@@ -25,5 +28,9 @@ export const env : Env = {
         nodeEnv : _env.data.NODE_ENV,
         betterAuthSecret : _env.data.BETTER_AUTH_SECRET,
         saltRounds : _env.data.SALT_ROUNDS,
-        betterAuthUrl : _env.data.BETTER_AUTH_URL
+        betterAuthUrl : _env.data.BETTER_AUTH_URL,
+        redisHost : _env.data.REDIS_HOST,
+        redisPort : _env.data.REDIS_PORT,
+        redisPassword : _env.data.REDIS_PASSWORD,
 } as const;
+
