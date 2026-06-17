@@ -105,9 +105,7 @@ export const book = pgTable(
       .defaultNow()
       .$onUpdate(() => new Date())
       .notNull(),
-    baseAmount: numeric("base_amount", { precision: 12, scale: 2 }).notNull(),
-    currentAmount: numeric("current_amount", { precision: 12, scale: 2 }).notNull(),
-  },
+    baseAmount: numeric("base_amount", { precision: 12, scale: 2 }).notNull()  },
   (table) => [index("book_userId_idx").on(table.userId)],
 );
 
