@@ -4,6 +4,7 @@ type AsyncFunction = (req : Request, res : Response, next : NextFunction) => Pro
 
 export const catchAsync = (fn : AsyncFunction)=>{
         return (req: Request, res : Response,next : NextFunction)=>{
-                fn(req,res,next).catch(err => next(err));
+                fn(req,res,next).catch(err => {console.error(err) 
+                        next(err)});
         }
 }

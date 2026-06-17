@@ -8,4 +8,7 @@ export const envSchema = z.object({
         BETTER_AUTH_SECRET : z.string(),
         SALT_ROUNDS : z.string().transform(Number).default(12),
         BETTER_AUTH_URL : z.string(),
+        REDIS_HOST: z.string(),
+        REDIS_PORT : z.string().transform(Number).default(6379),
+        REDIS_PASSWORD : z.string(),
 });
