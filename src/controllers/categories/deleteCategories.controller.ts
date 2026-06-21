@@ -3,6 +3,7 @@ import { categories, book } from "../../db/schema.js";
 import { catchAsync } from "../../utils/catchAsync.js";
 import { NextFunction, Response, Request } from "express";
 import { eq } from "drizzle-orm";
+import { unscheduleCategoryRenewJob } from "../../jobs/renew.queue.js";
 
 export const deleteCategory = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const categoryId = Number(req.params.id);
@@ -36,6 +37,10 @@ export const deleteCategory = catchAsync(async (req: Request, res: Response, nex
         .delete(categories)
         .where(eq(categories.id, categoryId))
         .returning();
+
+    if (deleted) {
+        await unscheduleCategoryRenewJob(deleted.id, deleted.renewCycle, deleted.renewCron);
+    }
 
     return res.status(200).json({
         success: true,

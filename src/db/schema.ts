@@ -127,6 +127,9 @@ export const categories = pgTable(
     name: text("name").notNull(),
     baseAmount: numeric("base_amount", { precision: 12, scale: 2 }).notNull(),
     carryForward: boolean("carry_forward").default(false).notNull(),
+    renewCycle: text("renew_cycle").default("monthly").notNull(),
+    renewCron: text("renew_cron").default("0 0 1 * *").notNull(),
+    nextRenewAt: timestamp("next_renew_at").defaultNow().notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
       .defaultNow()

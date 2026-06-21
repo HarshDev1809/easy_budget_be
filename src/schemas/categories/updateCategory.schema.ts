@@ -1,13 +1,12 @@
 import { z } from "zod";
 import { CronExpressionParser } from "cron-parser";
 
-export const createCategorySchema = z.object({
+export const updateCategorySchema = z.object({
   body: z.object({
-    name: z.string().min(1, "Name is required"),
-    bookId: z.string().uuid("Invalid book ID"),
-    baseAmount: z.string().regex(/^\d+(\.\d{1,2})?$/, "Invalid amount"),
-    carryForward: z.boolean().default(false),
-    renewCycle: z.enum(["daily", "weekly", "bi-weekly", "monthly", "custom"]).default("monthly"),
+    name: z.string().min(1, "Name is required").optional(),
+    baseAmount: z.string().regex(/^\d+(\.\d{1,2})?$/, "Invalid amount").optional(),
+    carryForward: z.boolean().optional(),
+    renewCycle: z.enum(["daily", "weekly", "bi-weekly", "monthly", "custom"]).optional(),
     renewDayOfWeek: z.number().min(0).max(6).optional(),
     renewDayOfMonth: z.number().min(1).max(31).optional(),
     customCron: z.string().optional(),
@@ -27,4 +26,4 @@ export const createCategorySchema = z.object({
     path: ["customCron"],
   }),
 });
-export type CreateCategoryInput = z.infer<typeof createCategorySchema>;
+export type UpdateCategoryInput = z.infer<typeof updateCategorySchema>;
