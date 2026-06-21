@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm";
-import { pgTable, text, timestamp, boolean, index, uuid, numeric } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, boolean, index, uuid, numeric, serial } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -109,9 +109,36 @@ export const book = pgTable(
   (table) => [index("book_userId_idx").on(table.userId)],
 );
 
-export const bookRelations = relations(book, ({ one }) => ({
+export const bookRelations = relations(book, ({ one,many }) => ({
   user: one(user, {
     fields: [book.userId],
     references: [user.id],
+  }),
+    categories: many(categories),
+}));
+
+export const categories = pgTable(
+  "categories",
+  {
+    id: serial("id").primaryKey(),
+    bookId: uuid("book_id")
+      .notNull()
+      .references(() => book.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    baseAmount: numeric("base_amount", { precision: 12, scale: 2 }).notNull(),
+    carryForward: boolean("carry_forward").default(false).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [index("category_bookId_idx").on(table.bookId)],
+);
+
+export const categoryRelations = relations(categories, ({ one }) => ({
+  book: one(book, {
+    fields: [categories.bookId],
+    references: [book.id],
   }),
 }));
