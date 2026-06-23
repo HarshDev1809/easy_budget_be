@@ -11,3 +11,8 @@ services:
       - shared-network
     # No volumes needed — dist is built inside the image
     command: node dist/index.js  # tsc already ran in Dockerfile builder stage
+
+networks:
+  shared-network:
+    external: true
+    name: shared-network
