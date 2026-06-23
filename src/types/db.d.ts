@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // src/types/db.ts
 import { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import { PgTransaction } from 'drizzle-orm/pg-core';

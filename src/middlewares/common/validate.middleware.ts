@@ -1,11 +1,5 @@
 import { Request,Response,NextFunction } from "express";
-import { z, ZodError, ZodObject, ZodTypeAny } from "zod";
-
-type ValidationSchema = ZodObject<{
-  body?   : ZodTypeAny;
-  query?  : ZodTypeAny;
-  params? : ZodTypeAny;
-}>;
+import { ZodObject } from "zod";
 
 export const validate = (schema: ZodObject) => (req : Request,res : Response,next : NextFunction)=>{
         const result = schema.safeParse({
@@ -25,8 +19,8 @@ export const validate = (schema: ZodObject) => (req : Request,res : Response,nex
                 })
         }
 
-        (req as any).validated = {
-                ...(req as any).validated,
+        req.validated = {
+                ...req.validated,
                 query: result.data.query,
                 body : result.data.body,
                 params : result.data.params

@@ -1,12 +1,12 @@
 import db from "../../db/index.js";
 import { categories, book } from "../../db/schema.js";
 import { catchAsync } from "../../utils/catchAsync.js";
-import { NextFunction, Response, Request } from "express";
+import { Response, Request } from "express";
 import { eq } from "drizzle-orm";
 import { scheduleCategoryRenewJob, unscheduleCategoryRenewJob } from "../../jobs/renew.queue.js";
 import { resolveRenewConfig } from "./createCategories.controller.js";
 
-export const updateCategory = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+export const updateCategory = catchAsync(async (req: Request, res: Response) => {
   const categoryId = Number(req.params.id);
   const { id: userId } = req.user;
   const { name, baseAmount, carryForward, renewCycle, renewDayOfWeek, renewDayOfMonth, customCron } = req.body;
@@ -44,7 +44,7 @@ export const updateCategory = catchAsync(async (req: Request, res: Response, nex
     renewDayOfMonth !== undefined ||
     customCron !== undefined;
 
-  let updateValues: Partial<typeof categories.$inferInsert> = {};
+  const updateValues: Partial<typeof categories.$inferInsert> = {};
 
   if (name !== undefined) updateValues.name = name;
   if (baseAmount !== undefined) updateValues.baseAmount = baseAmount;

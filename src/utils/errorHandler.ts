@@ -6,7 +6,8 @@ import { getStack } from './error/getStack.js';
 import { getMessage } from './error/getMessage.js';
 import { getHttpMessage } from './getHttpMessage.js';
 
-export const errorHandler = (err: any, req: Request, res: Response, next: NextFunction) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const errorHandler = (err: any, req: Request, res: Response, _next: NextFunction) => {
     const statusCode = getStatusCode(err)
     res.status(statusCode).json({
         success: false,
