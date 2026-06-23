@@ -8,7 +8,8 @@ export const auth = betterAuth({
         provider: "pg",
         schema: schema,
     }),
-    baseURL: "http://localhost:3000", // ← just the origin
+    trustedOrigins: ["https://easy-budget.devbydev.in"],
+    baseURL: "https://easy-budget.devbydev.in", // ← just the origin
     emailAndPassword: {
         enabled: true
     }
