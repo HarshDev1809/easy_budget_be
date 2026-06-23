@@ -1,0 +1,47 @@
+# Dependencies (reinstalled inside Docker)
+node_modules
+
+# TypeScript compiled output (rebuilt inside Docker)
+dist
+
+# Environment files (never goes into image)
+.env
+.env.*
+.env.local
+.env.production
+
+# Git
+.git
+.gitignore
+
+# Docker files themselves
+Dockerfile
+.dockerignore
+docker-compose*.yml
+
+# GitHub Actions
+.github
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor/IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# Test files (not needed in production)
+**/*.test.ts
+**/*.spec.ts
+coverage
+
+# Misc
+README.md
+*.md
