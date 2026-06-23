@@ -3,6 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      target: builder # Forces Docker to use the development stage with all source files
     container_name: easy_budget_server
     restart: always
     # Load all environment variables directly from the .env file
@@ -11,6 +12,10 @@ services:
     # Connect the app container to the external network shared with the Redis container
     networks:
       - shared-network
+    # Mount local directories so code changes and package.json are visible inside the container
+    volumes:
+      - .:/app
+      - /app/node_modules # Prevents host node_modules from overwriting container node_modules
     # Run database migrations first, then start the server
     command: sh -c "npm run start"
 
