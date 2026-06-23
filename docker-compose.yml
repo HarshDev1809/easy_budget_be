@@ -3,7 +3,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      target: builder # Forces Docker to use the development stage with all source files
     container_name: easy_budget_server
     restart: always
     # Load all environment variables directly from the .env file
