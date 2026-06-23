@@ -5,21 +5,9 @@ services:
       dockerfile: Dockerfile
     container_name: easy_budget_server
     restart: always
-    # Load all environment variables directly from the .env file
     env_file:
       - /home/hosting/env/easy_budget_be.env
-    # Connect the app container to the external network shared with the Redis container
     networks:
       - shared-network
-    # Mount local directories so code changes and package.json are visible inside the container
-    volumes:
-      - .:/app
-      - /app/node_modules # Prevents host node_modules from overwriting container node_modules
-    # Run database migrations first, then start the server
-    # Inside docker-compose.local.yml
-    command: sh -c "npm run build && npm run start"
-
-networks:
-  shared-network:
-    external: true
-    name: shared-network
+    # No volumes needed — dist is built inside the image
+    command: node dist/index.js  # tsc already ran in Dockerfile builder stage
