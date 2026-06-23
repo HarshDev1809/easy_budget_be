@@ -10,7 +10,7 @@ const app = express();
 
 app.use(helmet());
 app.use(cors({
-    origin: 'http://localhost:3000',
+    origin: 'https://easy-budget.devbydev.in',
     credentials: true
 }));
 // app.all("/api/auth/*all", async (req, res) => {
