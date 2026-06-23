@@ -3,7 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: easy_budget_app
+    container_name: easy_budget_server
     restart: always
     # Load all environment variables directly from the .env file
     env_file:
