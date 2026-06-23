@@ -39,6 +39,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Create network if not exists
+        run: docker network create shared-network || true
+
       - name: Build & restart container
         run: docker compose up -d --build --force-recreate
 
