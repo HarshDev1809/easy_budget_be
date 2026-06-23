@@ -17,7 +17,8 @@ services:
       - .:/app
       - /app/node_modules # Prevents host node_modules from overwriting container node_modules
     # Run database migrations first, then start the server
-    command: sh -c "npm run start"
+    # Inside docker-compose.local.yml
+    command: sh -c "npm run build && npm run start"
 
 networks:
   shared-network:
