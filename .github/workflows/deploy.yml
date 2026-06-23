@@ -39,9 +39,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Run migrations
-        run: docker compose run --rm app npm run db:push
-
       - name: Build & restart container
         run: docker compose up -d --build --force-recreate
 
