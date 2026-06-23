@@ -1,6 +1,6 @@
 import {Router} from 'express';
 import {status} from '../controllers/health/status.controller.js'
-import authRoutes from "./auth.routes.js"
+// import authRoutes from "./auth.routes.js"
 import {debug} from '../controllers/debug/debug.controller.js'
 import userRoutes from "./user.routes.js"
 import booksRoutes from "./book.routes.js"

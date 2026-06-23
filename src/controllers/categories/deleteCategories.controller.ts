@@ -1,11 +1,11 @@
 import db from "../../db/index.js";
 import { categories, book } from "../../db/schema.js";
 import { catchAsync } from "../../utils/catchAsync.js";
-import { NextFunction, Response, Request } from "express";
+import { Response, Request } from "express";
 import { eq } from "drizzle-orm";
 import { unscheduleCategoryRenewJob } from "../../jobs/renew.queue.js";
 
-export const deleteCategory = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+export const deleteCategory = catchAsync(async (req: Request, res: Response) => {
     const categoryId = Number(req.params.id);
     const { id: userId } = req.user;
 

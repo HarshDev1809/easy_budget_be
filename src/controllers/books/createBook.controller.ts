@@ -1,9 +1,9 @@
 import db from "../../db/index.js";
 import { book } from "../../db/schema.js";
 import { catchAsync } from "../../utils/catchAsync.js";
-import { NextFunction,Response, Request } from "express";
+import { Response, Request } from "express";
 
-export const createBook = catchAsync(async (req : Request,res : Response,next : NextFunction)=>{
+export const createBook = catchAsync(async (req : Request,res : Response)=>{
 
     const {body} = req;
     const {name, baseAmount} = body;

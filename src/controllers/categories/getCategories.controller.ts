@@ -1,10 +1,10 @@
 import db from "../../db/index.js";
 import { categories, book } from "../../db/schema.js";
 import { catchAsync } from "../../utils/catchAsync.js";
-import { NextFunction, Response, Request } from "express";
+import { Response, Request } from "express";
 import { eq, and } from "drizzle-orm";
 
-export const getCategories = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+export const getCategories = catchAsync(async (req: Request, res: Response) => {
   const bookId  = req.params.bookId as string;
   const { id: userId } = req.user;
 

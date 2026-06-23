@@ -12,7 +12,7 @@ export const debug = (req : Request,res : Response)=>{
                         })
                 }
 
-                let accessToken = req.cookies.access_token;
+                const accessToken = req.cookies.access_token;
 
                 return res.status(200).json({
                         message : 'Hello World!',
