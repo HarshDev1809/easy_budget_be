@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm";
-import { pgTable, text, timestamp, boolean, index, uuid, numeric, serial } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, boolean, index, uuid, numeric, serial, integer, pgEnum } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -114,7 +114,8 @@ export const bookRelations = relations(book, ({ one,many }) => ({
     fields: [book.userId],
     references: [user.id],
   }),
-    categories: many(categories),
+  categories: many(categories),
+  transactions: many(transactions),
 }));
 
 export const categories = pgTable(
@@ -139,9 +140,46 @@ export const categories = pgTable(
   (table) => [index("category_bookId_idx").on(table.bookId)],
 );
 
-export const categoryRelations = relations(categories, ({ one }) => ({
+export const categoryRelations = relations(categories, ({ one, many }) => ({
   book: one(book, {
     fields: [categories.bookId],
     references: [book.id],
+  }),
+  transactions: many(transactions),
+}));
+
+export const transactionTypeEnum = pgEnum("transaction_type", ["credit", "debit"]);
+
+export const transactions = pgTable(
+  "transactions",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    name: text("name").notNull(),
+    amount: numeric("amount", { precision: 12, scale: 2 }).notNull(),
+    type: transactionTypeEnum("type").notNull(),
+    bookId: uuid("book_id")
+      .notNull()
+      .references(() => book.id, { onDelete: "cascade" }),
+    categoryId: integer("category_id").references(() => categories.id, { onDelete: "set null" }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    index("transaction_bookId_idx").on(table.bookId),
+    index("transaction_categoryId_idx").on(table.categoryId),
+  ]
+);
+
+export const transactionRelations = relations(transactions, ({ one }) => ({
+  book: one(book, {
+    fields: [transactions.bookId],
+    references: [book.id],
+  }),
+  category: one(categories, {
+    fields: [transactions.categoryId],
+    references: [categories.id],
   }),
 }));
