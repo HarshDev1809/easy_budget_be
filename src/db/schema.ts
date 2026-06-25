@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm";
-import { pgTable, text, timestamp, boolean, index, uuid, numeric, serial } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, boolean, index, uuid, numeric, serial, integer } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -105,7 +105,9 @@ export const book = pgTable(
       .defaultNow()
       .$onUpdate(() => new Date())
       .notNull(),
-    baseAmount: numeric("base_amount", { precision: 12, scale: 2 }).notNull()  },
+    baseAmount: numeric("base_amount", { precision: 12, scale: 2 }).notNull(),
+    balance: numeric("balance", { precision: 12, scale: 2 }).default("0.00").notNull(),
+  },
   (table) => [index("book_userId_idx").on(table.userId)],
 );
 
@@ -114,7 +116,8 @@ export const bookRelations = relations(book, ({ one,many }) => ({
     fields: [book.userId],
     references: [user.id],
   }),
-    categories: many(categories),
+  categories: many(categories),
+  transactions: many(transactions),
 }));
 
 export const categories = pgTable(
@@ -130,6 +133,7 @@ export const categories = pgTable(
     renewCycle: text("renew_cycle").default("monthly").notNull(),
     renewCron: text("renew_cron").default("0 0 1 * *").notNull(),
     nextRenewAt: timestamp("next_renew_at").defaultNow().notNull(),
+    balance: numeric("balance", { precision: 12, scale: 2 }).default("0.00").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
       .defaultNow()
@@ -139,9 +143,55 @@ export const categories = pgTable(
   (table) => [index("category_bookId_idx").on(table.bookId)],
 );
 
-export const categoryRelations = relations(categories, ({ one }) => ({
+export const categoryRelations = relations(categories, ({ one, many }) => ({
   book: one(book, {
     fields: [categories.bookId],
     references: [book.id],
   }),
+  transactions: many(transactions),
 }));
+
+export const transactions = pgTable(
+  "transactions",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    name: text("name").notNull(),
+    amount: numeric("amount", { precision: 12, scale: 2 }).notNull(),
+    type: text("type").$type<"credit" | "debit">().notNull(),
+    bookId: uuid("book_id")
+      .notNull()
+      .references(() => book.id, { onDelete: "cascade" }),
+    categoryId: integer("category_id")
+      .references(() => categories.id, { onDelete: "set null" }),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    paidAt: timestamp("paid_at").defaultNow().notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    index("transaction_bookId_idx").on(table.bookId),
+    index("transaction_categoryId_idx").on(table.categoryId),
+    index("transaction_userId_idx").on(table.userId),
+  ]
+);
+
+export const transactionsRelations = relations(transactions, ({ one }) => ({
+  book: one(book, {
+    fields: [transactions.bookId],
+    references: [book.id],
+  }),
+  category: one(categories, {
+    fields: [transactions.categoryId],
+    references: [categories.id],
+  }),
+  user: one(user, {
+    fields: [transactions.userId],
+    references: [user.id],
+  }),
+}));
+

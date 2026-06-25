@@ -95,6 +95,7 @@ export const createCategory = catchAsync(async (req: Request, res: Response) => 
       name,
       bookId,
       baseAmount,
+      balance: baseAmount,
       carryForward: carryForward ?? false,
       renewCycle: resolvedCycle,
       renewCron,

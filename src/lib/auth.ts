@@ -8,9 +8,9 @@ export const auth = betterAuth({
         provider: "pg",
         schema: schema,
     }),
-    trustedOrigins: ["https://easy-budget.devbydev.in"],
-    baseURL: "https://easy-budget.devbydev.in", // ← just the origin
+    trustedOrigins: ["http://localhost:3000"],
+    baseURL: 'http://localhost:3000', // ← just the origin
     emailAndPassword: {
         enabled: true
     }
-});
+}); 

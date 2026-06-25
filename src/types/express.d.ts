@@ -10,6 +10,8 @@ declare global {
         email: string;
         // add other fields you set on req.user
       };
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      transaction?: any;
     }
   }
 }
