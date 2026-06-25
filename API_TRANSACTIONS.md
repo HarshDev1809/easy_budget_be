@@ -40,6 +40,7 @@ Create a new transaction and automatically adjust book and category balances.
   type: "credit" | "debit";       // credit (adds to balance), debit (subtracts from balance)
   bookId: string;                 // valid UUID string of the target Book
   categoryId?: number | string | null; // optional sub-category pointer
+  createdAt?: string;             // optional ISO-8601 UTC timestamp string (to backdate)
 }
 ```
 
@@ -101,12 +102,13 @@ Modify transaction fields. The backend automatically reverses the impact of the 
 * **Content-Type**: `application/json`
 * **Request Body** (All fields are optional for partial updates):
 ```typescript
-{
+export interface UpdateTransactionPayload {
   name?: string;
   amount?: number;
   type?: "credit" | "debit";
   bookId?: string;
   categoryId?: number | string | null;
+  createdAt?: string;             // Optional custom date/time (ISO-8601 string) to modify date
 }
 ```
 
