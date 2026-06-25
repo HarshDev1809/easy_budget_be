@@ -5,15 +5,13 @@ import {
   updateTransaction,
   requestDeleteTransaction,
   confirmDeleteTransaction,
-} from "../controllers/transactions.controller.js";
+} from "../controllers/transactions/transactions.controller.js";
 
 const router = Router();
 
-router.use(isAuthenticated);
-
-router.post("/", createTransaction);
-router.put("/:id", updateTransaction);
-router.post("/:id/delete/request", requestDeleteTransaction);
-router.delete("/:id", confirmDeleteTransaction);
+router.post("/", [isAuthenticated], createTransaction);
+router.put("/:id", [isAuthenticated], updateTransaction);
+router.post("/:id/delete/request", [isAuthenticated], requestDeleteTransaction);
+router.delete("/:id", [isAuthenticated], confirmDeleteTransaction);
 
 export default router;

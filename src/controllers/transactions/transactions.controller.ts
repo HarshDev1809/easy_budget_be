@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from "express";
-import { transactionSchema, verifyDeleteTransactionSchema } from "../schemas/transactions.schemas.js";
-import db from "../db/index.js";
-import { transactions, book, categories } from "../db/schema.js";
+import { transactionSchema, verifyDeleteTransactionSchema } from "../../schemas/transactions.schemas.js";
+import db from "../../db/index.js";
+import { transactions, book, categories } from "../../db/schema.js";
 import { eq, and, sql, inArray } from "drizzle-orm";
-import redis from "../redis/index.js";
+import redis from "../../redis/index.js";
 import crypto from "crypto";
 
 export const createTransaction = async (
