@@ -5,6 +5,7 @@ import {debug} from '../controllers/debug/debug.controller.js'
 import userRoutes from "./user.routes.js"
 import booksRoutes from "./book.routes.js"
 import categoriesRoutes from "./categories.routes.js"
+import transactionsRoutes from "./transactions.routes.js"
 
 const routes = Router();
 // routes.use("/auth",authRoutes)
@@ -13,6 +14,7 @@ routes.use('/debug',debug);
 routes.use("/user",userRoutes)
 routes.use("/books",booksRoutes);
 routes.use("/categories",categoriesRoutes)
+routes.use("/transactions",transactionsRoutes)
 
 export default routes;
 

@@ -8,6 +8,13 @@
       "when": 1782066216925,
       "tag": "0000_serious_stranger",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1782325172717,
+      "tag": "0001_natural_energizer",
+      "breakpoints": true
     }
   ]
 }
