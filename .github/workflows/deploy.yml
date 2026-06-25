@@ -10,6 +10,16 @@ jobs:
   test:
     name: Test
     runs-on: self-hosted
+    services:
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - uses: actions/checkout@v4
 
@@ -28,7 +38,14 @@ jobs:
         run: npm run lint
 
       - name: Run tests
-        run: echo "Skipping tests during automated validation phase"
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+          REDIS_HOST: localhost
+          REDIS_PORT: 6379
+          BETTER_AUTH_SECRET: secret
+          BETTER_AUTH_URL: http://localhost:3000
+        run: npm run test
 
   deploy:
     name: Deploy
