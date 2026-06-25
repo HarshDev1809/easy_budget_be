@@ -13,6 +13,7 @@ export const createBook = catchAsync(async (req : Request,res : Response)=>{
         name,
         userId,
         baseAmount,
+        balance: baseAmount,
         });
 
     return res.status(200).json({
