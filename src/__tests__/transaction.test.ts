@@ -264,6 +264,68 @@ describe("Transactions Integration Tests", () => {
     expect(resMissing.status).toBe(400);
   });
 
+  it("should support limit pagination and return nextCursor", async () => {
+    // We have 3 transactions in DB at this point: Gourmet Lunch (30.00), Backdated Grocery (15.00), Gift Money (100.00)
+    const resLimit = await request(app)
+      .get("/api/v1/transactions?limit=2")
+      .set("Cookie", authCookie);
+
+    expect(resLimit.status).toBe(200);
+    expect(resLimit.body.success).toBe(true);
+    expect(resLimit.body.data).toHaveLength(2);
+    expect(resLimit.body.nextCursor).toBeTypeOf("string");
+
+    // Fetch the next page using the cursor
+    const resNext = await request(app)
+      .get(`/api/v1/transactions?limit=2&cursor=${resLimit.body.nextCursor}`)
+      .set("Cookie", authCookie);
+
+    expect(resNext.status).toBe(200);
+    expect(resNext.body.success).toBe(true);
+    expect(resNext.body.data).toHaveLength(1);
+    expect(resNext.body.nextCursor).toBeNull();
+  });
+
+  it("should filter transactions by transactionType", async () => {
+    const resType = await request(app)
+      .get("/api/v1/transactions?transactionType=credit")
+      .set("Cookie", authCookie);
+
+    expect(resType.status).toBe(200);
+    expect(resType.body.data).toHaveLength(1);
+    expect(resType.body.data[0].name).toBe("Gift Money");
+  });
+
+  it("should search transactions by name, category name, or amount", async () => {
+    // Search by category name "Groceries"
+    const resCatSearch = await request(app)
+      .get("/api/v1/transactions?search=Groceries")
+      .set("Cookie", authCookie);
+
+    expect(resCatSearch.status).toBe(200);
+    // Should find Gourmet Lunch because it has category "Groceries"
+    expect(resCatSearch.body.data.some((t: any) => t.name === "Gourmet Lunch")).toBe(true);
+
+    // Search by name "Backdated"
+    const resNameSearch = await request(app)
+      .get("/api/v1/transactions?search=Backdated")
+      .set("Cookie", authCookie);
+
+    expect(resNameSearch.status).toBe(200);
+    expect(resNameSearch.body.data).toHaveLength(1);
+    expect(resNameSearch.body.data[0].name).toBe("Backdated Grocery");
+  });
+
+  it("should sort transactions by price (amount)", async () => {
+    const resPriceAsc = await request(app)
+      .get("/api/v1/transactions?sortBy=price&sortOrder=asc")
+      .set("Cookie", authCookie);
+
+    expect(resPriceAsc.status).toBe(200);
+    const amounts = resPriceAsc.body.data.map((t: any) => Number(t.amount));
+    expect(amounts).toEqual([15.0, 30.0, 100.0]); // Backdated Grocery, Gourmet Lunch, Gift Money
+  });
+
   it("should delete transaction and roll back balances with correct token (Phase 2)", async () => {
     const listRes = await request(app)
       .get("/api/v1/transactions")

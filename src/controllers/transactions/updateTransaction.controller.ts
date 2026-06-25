@@ -6,7 +6,7 @@ import { Response, Request } from "express";
 
 export const updateTransaction = catchAsync(async (req: Request, res: Response) => {
   const originalTxn = req.transaction;
-  const { name, amount, type, bookId, categoryId, createdAt } = req.validated.body;
+  const { name, amount, type, bookId, categoryId, createdAt, paidAt } = req.validated.body;
 
   const oldBookId = originalTxn.bookId;
   const oldCategoryId = originalTxn.categoryId;
@@ -85,6 +85,7 @@ export const updateTransaction = catchAsync(async (req: Request, res: Response) 
         categoryId: newCategoryId,
         updatedAt: new Date(),
         ...(createdAt !== undefined ? { createdAt: new Date(createdAt) } : {}),
+        ...(paidAt !== undefined ? { paidAt: new Date(paidAt) } : {}),
       })
       .where(eq(transactions.id, originalTxn.id))
       .returning();

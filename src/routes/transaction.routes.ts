@@ -9,6 +9,7 @@ import {
   deleteTransactionRequestSchema,
   deleteTransactionSchema,
 } from "../schemas/transactions/deleteTransaction.schema.js";
+import { getTransactionsSchema } from "../schemas/transactions/getTransactions.schema.js";
 
 // Authorization middlewares
 import { authoriseBookAccess } from "../middlewares/transactions/authoriseBookAccess.middleware.js";
@@ -37,7 +38,7 @@ router.post(
 );
 
 // 2. Get transaction history
-router.get("/", [isAuthenticated], getTransactions);
+router.get("/", [isAuthenticated, validate(getTransactionsSchema)], getTransactions);
 
 // 3. Update a transaction
 router.put(

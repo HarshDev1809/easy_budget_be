@@ -10,6 +10,7 @@ CREATE TABLE "transactions" (
 	"book_id" uuid NOT NULL,
 	"category_id" integer,
 	"user_id" text NOT NULL,
+	"paid_at" timestamp DEFAULT now() NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );

@@ -22,6 +22,7 @@ export const updateTransactionSchema = z.object({
         return val;
       }),
     createdAt: z.string().datetime("Invalid date format").optional(),
+    paidAt: z.string().datetime("Invalid date format").optional(),
   }),
 });
 

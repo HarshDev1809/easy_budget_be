@@ -5,7 +5,7 @@ import { catchAsync } from "../../utils/catchAsync.js";
 import { Response, Request } from "express";
 
 export const createTransaction = catchAsync(async (req: Request, res: Response) => {
-  const { name, amount, type, bookId, categoryId, createdAt } = req.validated.body;
+  const { name, amount, type, bookId, categoryId, createdAt, paidAt } = req.validated.body;
   const userId = req.user.id;
 
   const result = await db.transaction(async (tx) => {
@@ -20,6 +20,7 @@ export const createTransaction = catchAsync(async (req: Request, res: Response) 
         categoryId: categoryId || null,
         userId,
         ...(createdAt ? { createdAt: new Date(createdAt) } : {}),
+        ...(paidAt ? { paidAt: new Date(paidAt) } : {}),
       })
       .returning();
 
