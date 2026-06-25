@@ -67,12 +67,18 @@ Create a new transaction and automatically adjust book and category balances.
 ---
 
 ### 2.2. Get Transactions List
-Query transaction history. Results are ordered by `createdAt` descending.
+Retrieve transaction history. Supports cursor-based pagination, alphabetical/price/date sorting, search, and filters.
 
 * **Path**: `GET /transactions`
 * **Query Parameters**:
   - `bookId` (optional): Filter list to a specific Book (UUID).
   - `categoryId` (optional): Filter list to a specific Category (integer ID).
+  - `transactionType` (optional): Filter by transaction type (`credit` | `debit`).
+  - `limit` (optional): Maximum number of transactions to return (default: `10`, max: `100`).
+  - `cursor` (optional): Base64 encoded string representing the pagination boundary to fetch the next page.
+  - `sortBy` (optional): Field to sort by. One of: `createdAt` (default), `alphabet` (name), `price` (amount), `paidAt`, `updatedAt`.
+  - `sortOrder` (optional): Sort direction. One of: `desc` (default), `asc`.
+  - `search` (optional): Case-insensitive text query matching transaction `name`, `categoryName`, or `amount`.
 
 * **Success Response (200 OK)**:
 ```json
@@ -81,15 +87,18 @@ Query transaction history. Results are ordered by `createdAt` descending.
   "data": [
     {
       "id": "e4b6c310-91bf-4fa3-956b-3129487c569f",
-      "name": "Monthly Salary",
-      "amount": "3000.00",
-      "type": "credit",
+      "name": "Supermarket Grocery",
+      "amount": "50.25",
+      "type": "debit",
       "bookId": "a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d",
-      "categoryId": null,
-      "createdAt": "2026-06-25T18:10:00.000Z",
-      "updatedAt": "2026-06-25T18:10:00.000Z"
+      "categoryId": "12",
+      "categoryName": "Groceries",
+      "paidAt": "2026-06-25T18:15:00.000Z",
+      "createdAt": "2026-06-25T18:15:00.000Z",
+      "updatedAt": "2026-06-25T18:15:00.000Z"
     }
-  ]
+  ],
+  "nextCursor": "eyJzb3J0QnlWYWx1ZSI6IjIwMjYtMDYtMjVUMTg6MTU6MDAuMDAwWiIsImlkIjoiZTRiNmMzMTAtOTFiZi00ZmEzLTk1NmItMzEyOTQ4N2M1NjlmIn0="
 }
 ```
 
