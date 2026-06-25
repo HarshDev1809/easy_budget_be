@@ -79,6 +79,7 @@ describe("Transactions API", () => {
         });
 
       expect(res.status).toBe(201);
+      expect(res.body.success).toBe(true);
 
       const b = await db.query.book.findFirst({ where: eq(book.id, testBookId) });
       expect(parseFloat(b!.baseAmount)).toBe(300);
@@ -98,6 +99,7 @@ describe("Transactions API", () => {
         });
 
       expect(res.status).toBe(201);
+      expect(res.body.success).toBe(true);
 
       const b = await db.query.book.findFirst({ where: eq(book.id, testBookId) });
       expect(parseFloat(b!.baseAmount)).toBe(70);
@@ -128,6 +130,7 @@ describe("Transactions API", () => {
         });
 
       expect(res.status).toBe(200);
+      expect(res.body.success).toBe(true);
 
       const b = await db.query.book.findFirst({ where: eq(book.id, testBookId) });
       expect(parseFloat(b!.baseAmount)).toBe(80);
@@ -152,6 +155,7 @@ describe("Transactions API", () => {
         .post(`/api/v1/transactions/${tx!.id}/delete/request`)
         .send();
       expect(reqRes.status).toBe(200);
+      expect(reqRes.body.success).toBe(true);
       const { token } = reqRes.body;
       expect(token).toHaveLength(6);
 
@@ -160,6 +164,7 @@ describe("Transactions API", () => {
         .send({ token });
 
       expect(delRes.status).toBe(200);
+      expect(delRes.body.success).toBe(true);
 
       const b = await db.query.book.findFirst({ where: eq(book.id, testBookId) });
       expect(parseFloat(b!.baseAmount)).toBe(100);

@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from "express";
-import { verifyDeleteTransactionSchema } from "../../schemas/transactions.schemas.js";
 import db from "../../db/index.js";
 import { transactions, book, categories } from "../../db/schema.js";
 import { eq, and, sql } from "drizzle-orm";
@@ -15,7 +14,7 @@ export const requestDeleteTransaction = async (
     const { id } = req.params;
     const userId = req.user?.id;
     if (!userId) {
-      res.status(401).json({ error: "Unauthorized" });
+      res.status(401).json({ success: false, message: "Unauthorized" });
       return;
     }
 
@@ -25,7 +24,7 @@ export const requestDeleteTransaction = async (
     });
 
     if (!existingTx || existingTx.book.userId !== userId) {
-      res.status(404).json({ error: "Transaction not found or unauthorized" });
+      res.status(404).json({ success: false, message: "Transaction not found or unauthorized" });
       return;
     }
 
@@ -36,7 +35,7 @@ export const requestDeleteTransaction = async (
     const redisKey = `delete_tx_token:${id}`;
     await redis.set(redisKey, token, "EX", 300);
 
-    res.status(200).json({ token });
+    res.status(200).json({ success: true, token });
   } catch (error) {
     next(error);
   }
@@ -51,22 +50,17 @@ export const confirmDeleteTransaction = async (
     const { id } = req.params;
     const userId = req.user?.id;
     if (!userId) {
-      res.status(401).json({ error: "Unauthorized" });
+      res.status(401).json({ success: false, message: "Unauthorized" });
       return;
     }
 
-    const parsed = verifyDeleteTransactionSchema.safeParse(req.body);
-    if (!parsed.success) {
-      res.status(400).json({ error: "Invalid token format" });
-      return;
-    }
-    const { token } = parsed.data;
+    const { token } = req.body;
 
     const redisKey = `delete_tx_token:${id}`;
     const storedToken = await redis.getdel(redisKey);
 
     if (!storedToken || storedToken !== token) {
-      res.status(401).json({ error: "Invalid or expired token" });
+      res.status(401).json({ success: false, message: "Invalid or expired token" });
       return;
     }
 
@@ -76,7 +70,7 @@ export const confirmDeleteTransaction = async (
     });
 
     if (!existingTx || existingTx.book.userId !== userId) {
-      res.status(404).json({ error: "Transaction not found or unauthorized" });
+      res.status(404).json({ success: false, message: "Transaction not found or unauthorized" });
       return;
     }
 
@@ -105,7 +99,7 @@ export const confirmDeleteTransaction = async (
       }
     });
 
-    res.status(200).json({ message: "Transaction deleted successfully" });
+    res.status(200).json({ success: true, message: "Transaction deleted successfully" });
   } catch (error) {
     next(error);
   }

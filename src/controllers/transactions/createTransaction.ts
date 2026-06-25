@@ -12,7 +12,7 @@ export const createTransaction = async (
     const validatedData = req.body;
     const userId = req.user?.id;
     if (!userId) {
-      res.status(401).json({ error: "Unauthorized" });
+      res.status(401).json({ success: false, message: "Unauthorized" });
       return;
     }
 
@@ -21,7 +21,7 @@ export const createTransaction = async (
     });
 
     if (!bookRecord) {
-      res.status(404).json({ error: "Book not found or unauthorized" });
+      res.status(404).json({ success: false, message: "Book not found or unauthorized" });
       return;
     }
 
@@ -33,7 +33,7 @@ export const createTransaction = async (
         ),
       });
       if (!categoryRecord) {
-        res.status(404).json({ error: "Category not found in the given book" });
+        res.status(404).json({ success: false, message: "Category not found in the given book" });
         return;
       }
     }
@@ -61,7 +61,7 @@ export const createTransaction = async (
       }
     });
 
-    res.status(201).json({ message: "Transaction created successfully" });
+    res.status(201).json({ success: true, message: "Transaction created successfully" });
   } catch (error) {
     next(error);
   }
