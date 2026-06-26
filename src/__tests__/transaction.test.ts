@@ -3,26 +3,44 @@ import request from "supertest";
 import app from "../app.js";
 import db from "../db/index.js";
 import { user, book, categories, transactions } from "../db/schema.js";
-import { eq, and } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import redis from "../redis/index.js";
+import { randomUUID } from "crypto";
+
+interface TransactionResponse {
+  id: string;
+  name: string;
+  amount: string;
+  type: string;
+  bookId: string;
+  categoryId: string | null;
+  categoryName: string | null;
+  paidAt: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+const mockUserId = `test-user-${randomUUID()}`;
+const mockUserEmail = `test-${randomUUID()}@example.com`;
+const mockSessionToken = `test-session-${randomUUID()}`;
 
 // Mock the auth module to simulate authenticated requests
 vi.mock("../lib/auth.ts", () => {
   return {
     auth: {
       api: {
-        getSession: async (options: any) => {
+        getSession: async (options?: { headers?: { cookie?: string } }) => {
           const cookie = options?.headers?.cookie || "";
-          if (cookie.includes("session_token=test-session")) {
+          if (cookie.includes(`session_token=${mockSessionToken}`)) {
             return {
               user: {
-                id: "test-user-id",
-                email: "test@example.com",
+                id: mockUserId,
+                email: mockUserEmail,
                 name: "Test User",
               },
               session: {
-                id: "test-session-id",
-                token: "test-session",
+                id: `session-${mockSessionToken}`,
+                token: mockSessionToken,
               },
             };
           }
@@ -34,19 +52,19 @@ vi.mock("../lib/auth.ts", () => {
 });
 
 describe("Transactions Integration Tests", () => {
-  const authCookie = "session_token=test-session";
+  const authCookie = `session_token=${mockSessionToken}`;
   let testBookId: string;
   let testCategoryId: number;
 
   beforeAll(async () => {
     // 1. Clean up potential old test data by email to prevent duplicate key errors
-    await db.delete(user).where(eq(user.email, "test@example.com"));
+    await db.delete(user).where(eq(user.email, mockUserEmail));
 
     // 2. Insert test user
     await db.insert(user).values({
-      id: "test-user-id",
+      id: mockUserId,
       name: "Test User",
-      email: "test@example.com",
+      email: mockUserEmail,
       emailVerified: true,
     });
 
@@ -55,7 +73,7 @@ describe("Transactions Integration Tests", () => {
       .insert(book)
       .values({
         name: "Test Wallet",
-        userId: "test-user-id",
+        userId: mockUserId,
         baseAmount: "1000.00",
         balance: "1000.00",
       })
@@ -78,7 +96,7 @@ describe("Transactions Integration Tests", () => {
 
   afterAll(async () => {
     // Clean up all data associated with test user
-    await db.delete(user).where(eq(user.email, "test@example.com"));
+    await db.delete(user).where(eq(user.email, mockUserEmail));
   });
 
   it("should fail authentication without session cookie", async () => {
@@ -181,7 +199,9 @@ describe("Transactions Integration Tests", () => {
       .get("/api/v1/transactions")
       .set("Cookie", authCookie);
 
-    const transactionToUpdate = listRes.body.data.find((t: any) => t.name === "Lunch");
+    const transactionToUpdate = (listRes.body.data as TransactionResponse[]).find(
+      (t) => t.name === "Lunch"
+    ) as TransactionResponse;
     expect(transactionToUpdate).toBeDefined();
 
     // 2. Update it from: Lunch, 25.50, debit, Groceries (testCategoryId)
@@ -219,7 +239,9 @@ describe("Transactions Integration Tests", () => {
       .get("/api/v1/transactions")
       .set("Cookie", authCookie);
 
-    const transactionToDelete = listRes.body.data.find((t: any) => t.name === "Gourmet Lunch");
+    const transactionToDelete = (listRes.body.data as TransactionResponse[]).find(
+      (t) => t.name === "Gourmet Lunch"
+    ) as TransactionResponse;
     expect(transactionToDelete).toBeDefined();
 
     const requestRes = await request(app)
@@ -244,7 +266,9 @@ describe("Transactions Integration Tests", () => {
       .get("/api/v1/transactions")
       .set("Cookie", authCookie);
 
-    const transactionToDelete = listRes.body.data.find((t: any) => t.name === "Gourmet Lunch");
+    const transactionToDelete = (listRes.body.data as TransactionResponse[]).find(
+      (t) => t.name === "Gourmet Lunch"
+    ) as TransactionResponse;
 
     // Mismatched token
     const resWrong = await request(app)
@@ -304,7 +328,7 @@ describe("Transactions Integration Tests", () => {
 
     expect(resCatSearch.status).toBe(200);
     // Should find Gourmet Lunch because it has category "Groceries"
-    expect(resCatSearch.body.data.some((t: any) => t.name === "Gourmet Lunch")).toBe(true);
+    expect((resCatSearch.body.data as TransactionResponse[]).some((t) => t.name === "Gourmet Lunch")).toBe(true);
 
     // Search by name "Backdated"
     const resNameSearch = await request(app)
@@ -322,7 +346,7 @@ describe("Transactions Integration Tests", () => {
       .set("Cookie", authCookie);
 
     expect(resPriceAsc.status).toBe(200);
-    const amounts = resPriceAsc.body.data.map((t: any) => Number(t.amount));
+    const amounts = (resPriceAsc.body.data as TransactionResponse[]).map((t) => Number(t.amount));
     expect(amounts).toEqual([15.0, 30.0, 100.0]); // Backdated Grocery, Gourmet Lunch, Gift Money
   });
 
@@ -331,7 +355,9 @@ describe("Transactions Integration Tests", () => {
       .get("/api/v1/transactions")
       .set("Cookie", authCookie);
 
-    const transactionToDelete = listRes.body.data.find((t: any) => t.name === "Gourmet Lunch");
+    const transactionToDelete = (listRes.body.data as TransactionResponse[]).find(
+      (t) => t.name === "Gourmet Lunch"
+    ) as TransactionResponse;
     const storedToken = await redis.get(`delete-transaction:${transactionToDelete.id}`);
 
     // Confirm deletion
