@@ -1,7 +1,7 @@
 import 'dotenv/config';
 
-// Unconditionally set NODE_ENV to "dev" to satisfy the env.schema.ts validation
-process.env.NODE_ENV = "dev";
+// Ensure NODE_ENV is set to "test" for the vitest environment
+process.env.NODE_ENV = "test";
 
 process.env.DATABASE_URL = process.env.DATABASE_URL || "postgres://postgres:postgres@localhost:6543/postgres";
 process.env.DIRECT_URL = process.env.DIRECT_URL || "postgres://postgres:postgres@localhost:5432/postgres";
