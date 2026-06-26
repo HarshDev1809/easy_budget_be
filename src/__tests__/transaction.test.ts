@@ -5,6 +5,7 @@ import db from "../db/index.js";
 import { user, book, categories, transactions } from "../db/schema.js";
 import { eq } from "drizzle-orm";
 import redis from "../redis/index.js";
+import { randomUUID } from "crypto";
 
 interface TransactionResponse {
   id: string;
@@ -19,6 +20,10 @@ interface TransactionResponse {
   updatedAt: string;
 }
 
+const mockUserId = `test-user-${randomUUID()}`;
+const mockUserEmail = `test-${randomUUID()}@example.com`;
+const mockSessionToken = `test-session-${randomUUID()}`;
+
 // Mock the auth module to simulate authenticated requests
 vi.mock("../lib/auth.ts", () => {
   return {
@@ -26,16 +31,16 @@ vi.mock("../lib/auth.ts", () => {
       api: {
         getSession: async (options?: { headers?: { cookie?: string } }) => {
           const cookie = options?.headers?.cookie || "";
-          if (cookie.includes("session_token=test-session")) {
+          if (cookie.includes(`session_token=${mockSessionToken}`)) {
             return {
               user: {
-                id: "test-user-id",
-                email: "test@example.com",
+                id: mockUserId,
+                email: mockUserEmail,
                 name: "Test User",
               },
               session: {
-                id: "test-session-id",
-                token: "test-session",
+                id: `session-${mockSessionToken}`,
+                token: mockSessionToken,
               },
             };
           }
@@ -47,19 +52,19 @@ vi.mock("../lib/auth.ts", () => {
 });
 
 describe("Transactions Integration Tests", () => {
-  const authCookie = "session_token=test-session";
+  const authCookie = `session_token=${mockSessionToken}`;
   let testBookId: string;
   let testCategoryId: number;
 
   beforeAll(async () => {
     // 1. Clean up potential old test data by email to prevent duplicate key errors
-    await db.delete(user).where(eq(user.email, "test@example.com"));
+    await db.delete(user).where(eq(user.email, mockUserEmail));
 
     // 2. Insert test user
     await db.insert(user).values({
-      id: "test-user-id",
+      id: mockUserId,
       name: "Test User",
-      email: "test@example.com",
+      email: mockUserEmail,
       emailVerified: true,
     });
 
@@ -68,7 +73,7 @@ describe("Transactions Integration Tests", () => {
       .insert(book)
       .values({
         name: "Test Wallet",
-        userId: "test-user-id",
+        userId: mockUserId,
         baseAmount: "1000.00",
         balance: "1000.00",
       })
@@ -91,7 +96,7 @@ describe("Transactions Integration Tests", () => {
 
   afterAll(async () => {
     // Clean up all data associated with test user
-    await db.delete(user).where(eq(user.email, "test@example.com"));
+    await db.delete(user).where(eq(user.email, mockUserEmail));
   });
 
   it("should fail authentication without session cookie", async () => {
