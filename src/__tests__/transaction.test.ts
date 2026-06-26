@@ -47,8 +47,22 @@ describe("Transactions Integration Tests", () => {
   let testCategoryId: number;
 
   beforeAll(async () => {
-    // 1. Clean up potential old test data by email to prevent duplicate key errors
-    await db.delete(user).where(eq(user.email, "test@example.com"));
+    // 1. Clean up potential old test data to prevent duplicate key errors
+    // Since user has related book/categories, delete them first.
+    // However, Drizzle cascading deletes or fetching IDs manually can be tedious.
+    // A simpler way is to fetch the user id, delete related tables if exists, then delete user.
+    const [existingUser] = await db.select().from(user).where(eq(user.email, "test@example.com"));
+    if (existingUser) {
+      // Find books related to this user
+      const existingBooks = await db.select().from(book).where(eq(book.userId, existingUser.id));
+      for (const b of existingBooks) {
+        // Find categories for this book
+        await db.delete(categories).where(eq(categories.bookId, b.id));
+        await db.delete(transactions).where(eq(transactions.bookId, b.id));
+        await db.delete(book).where(eq(book.id, b.id));
+      }
+      await db.delete(user).where(eq(user.email, "test@example.com"));
+    }
 
     // 2. Insert test user
     await db.insert(user).values({
@@ -86,7 +100,16 @@ describe("Transactions Integration Tests", () => {
 
   afterAll(async () => {
     // Clean up all data associated with test user
-    await db.delete(user).where(eq(user.email, "test@example.com"));
+    const [existingUser] = await db.select().from(user).where(eq(user.email, "test@example.com"));
+    if (existingUser) {
+      const existingBooks = await db.select().from(book).where(eq(book.userId, existingUser.id));
+      for (const b of existingBooks) {
+        await db.delete(categories).where(eq(categories.bookId, b.id));
+        await db.delete(transactions).where(eq(transactions.bookId, b.id));
+        await db.delete(book).where(eq(book.id, b.id));
+      }
+      await db.delete(user).where(eq(user.email, "test@example.com"));
+    }
   });
 
   it("should fail authentication without session cookie", async () => {
