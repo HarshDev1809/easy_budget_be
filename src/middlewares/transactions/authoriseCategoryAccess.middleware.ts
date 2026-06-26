@@ -30,11 +30,12 @@ export const authoriseCategoryAccess = catchAsync(async (req: Request, res: Resp
       .where(eq(categories.id, catIdNum))
       .limit(1);
 
-    if (catList.length === 0) {
+    const firstCat = catList[0];
+    if (!firstCat) {
       return res.status(404).json({ success: false, message: "Category not found" });
     }
 
-    if (catList[0].bookId !== bookId) {
+    if (firstCat.bookId !== bookId) {
       return res.status(400).json({ success: false, message: "Category does not belong to the specified book" });
     }
   }

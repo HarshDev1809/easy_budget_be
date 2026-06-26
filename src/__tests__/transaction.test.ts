@@ -78,7 +78,7 @@ describe("Transactions Integration Tests", () => {
         balance: "1000.00",
       })
       .returning();
-    testBookId = insertedBook.id;
+    testBookId = insertedBook!.id;
 
     // 4. Insert test category
     const [insertedCategory] = await db
@@ -91,7 +91,7 @@ describe("Transactions Integration Tests", () => {
         renewCycle: "monthly",
       })
       .returning();
-    testCategoryId = insertedCategory.id;
+    testCategoryId = insertedCategory!.id;
   });
 
   afterAll(async () => {
@@ -134,10 +134,10 @@ describe("Transactions Integration Tests", () => {
 
     // Verify Book and Category balances updated in DB
     const [updatedBook] = await db.select().from(book).where(eq(book.id, testBookId));
-    expect(Number(updatedBook.balance)).toBe(974.5); // 1000.00 - 25.50
+    expect(Number(updatedBook!.balance)).toBe(974.5); // 1000.00 - 25.50
 
     const [updatedCategory] = await db.select().from(categories).where(eq(categories.id, testCategoryId));
-    expect(Number(updatedCategory.balance)).toBe(274.5); // 300.00 - 25.50
+    expect(Number(updatedCategory!.balance)).toBe(274.5); // 300.00 - 25.50
   });
 
   it("should create a debit transaction with a custom client-provided createdAt date", async () => {
@@ -175,7 +175,7 @@ describe("Transactions Integration Tests", () => {
 
     // Verify Book balance updated (Category remains untouched since categoryId was null)
     const [updatedBook] = await db.select().from(book).where(eq(book.id, testBookId));
-    expect(Number(updatedBook.balance)).toBe(1059.5); // 959.50 + 100.00
+    expect(Number(updatedBook!.balance)).toBe(1059.5); // 959.50 + 100.00
   });
 
   it("should reject transaction creation if book does not belong to user", async () => {
@@ -225,13 +225,13 @@ describe("Transactions Integration Tests", () => {
     // Reversing 25.50 debit: 1059.50 + 25.50 = 1085.00
     // Applying 30.00 debit: 1085.00 - 30.00 = 1055.00
     const [updatedBook] = await db.select().from(book).where(eq(book.id, testBookId));
-    expect(Number(updatedBook.balance)).toBe(1055.0);
+    expect(Number(updatedBook!.balance)).toBe(1055.0);
 
     // Old Category balance: 274.50
     // Reversing 25.50 debit: 274.50 + 25.50 = 300.00
     // Applying 30.00 debit: 300.00 - 30.00 = 270.00
     const [updatedCategory] = await db.select().from(categories).where(eq(categories.id, testCategoryId));
-    expect(Number(updatedCategory.balance)).toBe(270.0);
+    expect(Number(updatedCategory!.balance)).toBe(270.0);
   });
 
   it("should trigger deletion request (Phase 1) and return 6-character token", async () => {
@@ -372,11 +372,11 @@ describe("Transactions Integration Tests", () => {
     // 1. Verify balances are rolled back (Gourmet Lunch was 30.00 debit, so it should add 30.00 back)
     // Book balance before delete: 1055.00 -> should be 1055.00 + 30.00 = 1085.00
     const [updatedBook] = await db.select().from(book).where(eq(book.id, testBookId));
-    expect(Number(updatedBook.balance)).toBe(1085.0);
+    expect(Number(updatedBook!.balance)).toBe(1085.0);
 
     // Category balance before delete: 270.00 -> should be 270.00 + 30.00 = 300.00
     const [updatedCategory] = await db.select().from(categories).where(eq(categories.id, testCategoryId));
-    expect(Number(updatedCategory.balance)).toBe(300.0);
+    expect(Number(updatedCategory!.balance)).toBe(300.0);
 
     // 2. Verify transaction is deleted from DB
     const [checkTxn] = await db.select().from(transactions).where(eq(transactions.id, transactionToDelete.id));

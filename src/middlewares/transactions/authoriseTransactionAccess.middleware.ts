@@ -22,10 +22,11 @@ export const authoriseTransactionAccess = catchAsync(async (req: Request, res: R
     .where(and(eq(transactions.id, transactionId), eq(book.userId, userId)))
     .limit(1);
 
-  if (txnList.length === 0) {
+  const firstTxn = txnList[0];
+  if (!firstTxn) {
     return res.status(404).json({ success: false, message: "Transaction not found or unauthorized" });
   }
 
-  req.transaction = txnList[0].transaction;
+  req.transaction = firstTxn.transaction;
   next();
 });

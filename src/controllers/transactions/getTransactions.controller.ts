@@ -37,13 +37,14 @@ export const getTransactions = catchAsync(async (req: Request, res: Response) =>
   // 4. Search logic (ilike on name, categoryName, or amount)
   if (search) {
     const searchPattern = `%${search}%`;
-    conditions.push(
-      or(
-        ilike(transactions.name, searchPattern),
-        ilike(categories.name, searchPattern),
-        sql`CAST(${transactions.amount} AS TEXT) LIKE ${searchPattern}`
-      )
+    const searchOr = or(
+      ilike(transactions.name, searchPattern),
+      ilike(categories.name, searchPattern),
+      sql`CAST(${transactions.amount} AS TEXT) LIKE ${searchPattern}`
     );
+    if (searchOr) {
+      conditions.push(searchOr);
+    }
   }
 
   // 5. Setup sorting columns mapping
@@ -73,15 +74,16 @@ export const getTransactions = catchAsync(async (req: Request, res: Response) =>
         const mainOperator = isDesc ? lt : gt;
         const tieOperator = isDesc ? lt : gt;
 
-        conditions.push(
-          or(
-            mainOperator(sortCol, boundaryVal),
-            and(
-              eq(sortCol, boundaryVal),
-              tieOperator(transactions.id, cursorId)
-            )
+        const cursorCond = or(
+          mainOperator(sortCol, boundaryVal as any),
+          and(
+            eq(sortCol, boundaryVal as any),
+            tieOperator(transactions.id, cursorId)
           )
         );
+        if (cursorCond) {
+          conditions.push(cursorCond);
+        }
       }
     } catch (err) {
       console.error("Failed to parse pagination cursor:", err);
@@ -121,12 +123,14 @@ export const getTransactions = catchAsync(async (req: Request, res: Response) =>
 
   if (hasMore && paginatedList.length > 0) {
     const nextItem = paginatedList[paginatedList.length - 1];
-    let sortByValue = nextItem[sortBy as keyof typeof nextItem];
-    if (sortByValue instanceof Date) {
-      sortByValue = sortByValue.toISOString();
+    if (nextItem) {
+      let sortByValue: any = nextItem[sortBy as keyof typeof nextItem];
+      if (sortByValue instanceof Date) {
+        sortByValue = sortByValue.toISOString();
+      }
+      const cursorObj = { sortByValue, id: nextItem.id };
+      nextCursor = Buffer.from(JSON.stringify(cursorObj)).toString("base64");
     }
-    const cursorObj = { sortByValue, id: nextItem.id };
-    nextCursor = Buffer.from(JSON.stringify(cursorObj)).toString("base64");
   }
 
   // Formatting output schema for client container compatibility

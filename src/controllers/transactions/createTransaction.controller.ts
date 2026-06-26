@@ -52,6 +52,9 @@ export const createTransaction = catchAsync(async (req: Request, res: Response) 
       }
     }
 
+    if (!newTxn) {
+      throw new Error("Failed to create transaction");
+    }
     return newTxn;
   });
 
