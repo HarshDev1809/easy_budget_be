@@ -64,9 +64,9 @@ export const getTransactions = catchAsync(async (req: Request, res: Response) =>
       const { sortByValue, id: cursorId } = cursorData;
 
       if (sortByValue !== undefined && cursorId !== undefined) {
-        let boundaryVal: any = sortByValue;
+        let boundaryVal: string | number | boolean | Date = sortByValue as string | number | boolean;
         if (["createdAt", "updatedAt", "paidAt"].includes(sortBy)) {
-          boundaryVal = new Date(sortByValue);
+          boundaryVal = new Date(sortByValue as string | number | Date);
         }
 
         const isDesc = sortOrder === "desc";
