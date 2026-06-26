@@ -75,9 +75,9 @@ export const getTransactions = catchAsync(async (req: Request, res: Response) =>
         const tieOperator = isDesc ? lt : gt;
 
         const cursorCond = or(
-          mainOperator(sortCol, boundaryVal as any),
+          mainOperator(sortCol, boundaryVal as string | Date),
           and(
-            eq(sortCol, boundaryVal as any),
+            eq(sortCol, boundaryVal as string | Date),
             tieOperator(transactions.id, cursorId)
           )
         );
@@ -124,7 +124,7 @@ export const getTransactions = catchAsync(async (req: Request, res: Response) =>
   if (hasMore && paginatedList.length > 0) {
     const nextItem = paginatedList[paginatedList.length - 1];
     if (nextItem) {
-      let sortByValue: any = nextItem[sortBy as keyof typeof nextItem];
+      let sortByValue: unknown = nextItem[sortBy as keyof typeof nextItem];
       if (sortByValue instanceof Date) {
         sortByValue = sortByValue.toISOString();
       }
