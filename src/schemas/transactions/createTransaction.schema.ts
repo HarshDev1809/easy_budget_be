@@ -5,7 +5,7 @@ export const createTransactionSchema = z.object({
     name: z.string().min(1, "Transaction name is required"),
     amount: z.number().finite().positive("Amount must be a positive number"),
     type: z.enum(["credit", "debit"], {
-      errorMap: () => ({ message: "Type must be 'credit' or 'debit'" }),
+      message: "Type must be 'credit' or 'debit'",
     }),
     bookId: z.string().uuid("Book ID must be a valid UUID"),
     categoryId: z

@@ -90,6 +90,9 @@ export const updateTransaction = catchAsync(async (req: Request, res: Response) 
       .where(eq(transactions.id, originalTxn.id))
       .returning();
 
+    if (!updatedTxn) {
+      throw new Error("Transaction not found");
+    }
     return updatedTxn;
   });
 
