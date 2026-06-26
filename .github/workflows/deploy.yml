@@ -24,7 +24,7 @@ jobs:
       - name: Start Redis
         run: |
           docker run -d --name test-redis \
-            -p 6379:6379 \
+            -p 6380:6379 \
             redis:alpine
 
       - name: Wait for Postgres to be ready
@@ -61,7 +61,7 @@ jobs:
           BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
           BETTER_AUTH_URL: ${{ secrets.BETTER_AUTH_URL }}
           REDIS_HOST: 127.0.0.1
-          REDIS_PORT: 6379
+          REDIS_PORT: 6380
           REDIS_PASSWORD: ""
 
       - name: Cleanup containers
