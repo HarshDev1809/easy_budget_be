@@ -29,6 +29,13 @@ jobs:
 
       - name: Run tests
         run: npm run test
+        env:
+         DATABASE_URL: ${{ secrets.DATABASE_URL }}
+         DIRECT_URL: ${{ secrets.DIRECT_URL }}
+         BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
+         BETTER_AUTH_URL: ${{ secrets.BETTER_AUTH_URL }}
+         REDIS_HOST: ${{ secrets.REDIS_HOST }}
+         REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
 
   deploy:
     name: Deploy
