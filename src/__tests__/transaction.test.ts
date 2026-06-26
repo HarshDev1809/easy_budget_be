@@ -3,15 +3,23 @@ import request from "supertest";
 import app from "../app.js";
 import db from "../db/index.js";
 import { user, book, categories, transactions } from "../db/schema.js";
-import { eq, and } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import redis from "../redis/index.js";
+
+interface TestTransaction {
+  id: string;
+  name: string;
+  amount: string | number;
+  type: string;
+  categoryId?: string | null;
+}
 
 // Mock the auth module to simulate authenticated requests
 vi.mock("../lib/auth.ts", () => {
   return {
     auth: {
       api: {
-        getSession: async (options: any) => {
+        getSession: async (options: { headers?: { cookie?: string } } | undefined) => {
           const cookie = options?.headers?.cookie || "";
           if (cookie.includes("session_token=test-session")) {
             return {
@@ -181,7 +189,7 @@ describe("Transactions Integration Tests", () => {
       .get("/api/v1/transactions")
       .set("Cookie", authCookie);
 
-    const transactionToUpdate = listRes.body.data.find((t: any) => t.name === "Lunch");
+    const transactionToUpdate = listRes.body.data.find((t: TestTransaction) => t.name === "Lunch");
     expect(transactionToUpdate).toBeDefined();
 
     // 2. Update it from: Lunch, 25.50, debit, Groceries (testCategoryId)
@@ -219,7 +227,7 @@ describe("Transactions Integration Tests", () => {
       .get("/api/v1/transactions")
       .set("Cookie", authCookie);
 
-    const transactionToDelete = listRes.body.data.find((t: any) => t.name === "Gourmet Lunch");
+    const transactionToDelete = listRes.body.data.find((t: TestTransaction) => t.name === "Gourmet Lunch");
     expect(transactionToDelete).toBeDefined();
 
     const requestRes = await request(app)
@@ -244,7 +252,7 @@ describe("Transactions Integration Tests", () => {
       .get("/api/v1/transactions")
       .set("Cookie", authCookie);
 
-    const transactionToDelete = listRes.body.data.find((t: any) => t.name === "Gourmet Lunch");
+    const transactionToDelete = listRes.body.data.find((t: TestTransaction) => t.name === "Gourmet Lunch");
 
     // Mismatched token
     const resWrong = await request(app)
@@ -304,7 +312,7 @@ describe("Transactions Integration Tests", () => {
 
     expect(resCatSearch.status).toBe(200);
     // Should find Gourmet Lunch because it has category "Groceries"
-    expect(resCatSearch.body.data.some((t: any) => t.name === "Gourmet Lunch")).toBe(true);
+    expect(resCatSearch.body.data.some((t: TestTransaction) => t.name === "Gourmet Lunch")).toBe(true);
 
     // Search by name "Backdated"
     const resNameSearch = await request(app)
@@ -322,7 +330,7 @@ describe("Transactions Integration Tests", () => {
       .set("Cookie", authCookie);
 
     expect(resPriceAsc.status).toBe(200);
-    const amounts = resPriceAsc.body.data.map((t: any) => Number(t.amount));
+    const amounts = resPriceAsc.body.data.map((t: TestTransaction) => Number(t.amount));
     expect(amounts).toEqual([15.0, 30.0, 100.0]); // Backdated Grocery, Gourmet Lunch, Gift Money
   });
 
@@ -331,7 +339,7 @@ describe("Transactions Integration Tests", () => {
       .get("/api/v1/transactions")
       .set("Cookie", authCookie);
 
-    const transactionToDelete = listRes.body.data.find((t: any) => t.name === "Gourmet Lunch");
+    const transactionToDelete = listRes.body.data.find((t: TestTransaction) => t.name === "Gourmet Lunch");
     const storedToken = await redis.get(`delete-transaction:${transactionToDelete.id}`);
 
     // Confirm deletion
